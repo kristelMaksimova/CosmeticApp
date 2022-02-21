@@ -21,12 +21,12 @@ class ProductsCell: UITableViewCell {
         productsName.text = products.name
         productsPrice.text = "$ \(products.price ?? "")"
         
-        DispatchQueue.global().async {
-            guard let stringURL = products.image_link else { return }
-            guard let url = URL(string: stringURL) else { return }
-            guard let imageData = try? Data(contentsOf: url) else { return }
-            DispatchQueue.main.async {
+        NetworkManager.shared.fetchImage(from: products.image_link) { result in
+            switch result {
+            case .success(let imageData):
                 self.productsImage.image = UIImage(data: imageData)
+            case .failure(let error):
+                print(error)
             }
         }
     }

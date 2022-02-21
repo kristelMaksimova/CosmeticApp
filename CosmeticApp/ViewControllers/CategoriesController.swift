@@ -7,24 +7,6 @@
 
 import UIKit
 
-enum Link: String {
-    case nailPolish = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=nail_polish"
-    case lipstick = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=lipstick"
-    case mascara = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=mascara"
-    case eyeshadow = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=eyeshadow"
-    case blush = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=blush"
-    case bronzer = "http://makeup-api.herokuapp.com/api/v1/products.json?product_type=bronzer"
-}
-
-enum UserAction: String, CaseIterable {
-    case nailPolish = "NailPolish"
-    case lipstick = "Lipstick"
-    case mascara = "Mascara"
-    case eyeshadow = "Eyeshadow"
-    case blush = "Blush"
-    case bronzer = "Bronzer"
-}
-
 class CategoriesController: UICollectionViewController {
     
     let userActions = UserAction.allCases
@@ -39,6 +21,7 @@ class CategoriesController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CaregoriesCell
+        
         cell.userActionsLabel.text = userActions[indexPath.item].rawValue
         
         return cell
@@ -96,83 +79,8 @@ class CategoriesController: UICollectionViewController {
             productsVC.fetchProducts(product: Link.bronzer)
         }
     }
-    
-    // MARK: - Private Methods
-    private func successAlert() {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: "Success",
-                message: "You can see the results in the Debug aria",
-                preferredStyle: .alert
-            )
-            
-            let okAction = UIAlertAction(title: "OK", style: .default)
-            alert.addAction(okAction)
-            self.present(alert, animated: true)
-        }
-    }
-    
-    private func failedAlert() {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: "Failed",
-                message: "You can see error in the Debug aria",
-                preferredStyle: .alert
-            )
-            
-            let okAction = UIAlertAction(title: "OK", style: .default)
-            alert.addAction(okAction)
-            self.present(alert, animated: true)
-        }
-    }
 }
-
-//MARK: - Networking
-extension CategoriesController {
-    private func nailPolishButtonPressed() {
-        buttonPressed(product: Link.nailPolish)
-    }
-
-    private func lipstickButtonPressed() {
-        buttonPressed(product: Link.lipstick)
-    }
     
-    private func mascaraButtonPressed() {
-        buttonPressed(product: Link.mascara)
-    }
-    
-    private func eyeshadowButtonPressed() {
-        buttonPressed(product: Link.eyeshadow)
-    }
-    
-    private func blushButtonPressed() {
-        buttonPressed(product: Link.blush)
-    }
-    
-    private func bronzerButtonPressed() {
-        buttonPressed(product: Link.bronzer)
-    }
-    
-    private func buttonPressed(product: Link) {
-        guard let url = URL(string: product.rawValue) else { return }
-        
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data else {
-                print(error?.localizedDescription ?? "No error description")
-                return
-            }
-            do {
-                let products = try JSONDecoder().decode(Cosmetics.self, from: data)
-                self.successAlert()
-                print(products)
-            } catch {
-                self.failedAlert()
-                print(error.localizedDescription)
-            }
-        }.resume()
-    }
-}
-
 //MARK: - UICollectionViewDelegateFlowLayout
 
 extension CategoriesController: UICollectionViewDelegateFlowLayout {

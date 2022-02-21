@@ -40,23 +40,15 @@ class ProductsController: UITableViewController {
 // MARK: - Networking
 extension ProductsController {
     func fetchProducts(product: Link) {
-        guard let url = URL(string: product.rawValue) else { return }
-        
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data else {
-                print(error?.localizedDescription ?? "No error description")
-                return
+        NetworkManager.shared.fetchDataWithAlamofire(product.rawValue) { result in
+            switch result {
+            case .success(let eyeshadow):
+                self.products = eyeshadow
+                self.tableView.reloadData()
+            case .failure(let error):
+                print(error)
             }
-            do {
-                self.products = try JSONDecoder().decode([Cosmetics].self, from: data)
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            } catch let error {
-                print(error.localizedDescription)
-            }
-            
-        }.resume()
+        }
     }
 }
 
